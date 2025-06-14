@@ -77,6 +77,12 @@ function showQuestion() {
     // 選択状態をリセット
     options.forEach(option => {
         option.classList.remove('selected');
+        
+        // 既に回答済みの場合、選択状態を復元
+        if (userAnswers[currentQuestion] !== undefined && 
+            parseInt(option.getAttribute('data-value')) === userAnswers[currentQuestion]) {
+            option.classList.add('selected');
+        }
     });
 }
 
@@ -90,6 +96,7 @@ options.forEach(option => {
         // 回答を記録
         const value = parseInt(option.getAttribute('data-value'));
         userAnswers[currentQuestion] = value;
+        console.log(`Question ${currentQuestion + 1} answered: ${value}`);
         
         // 少し待ってから次の質問へ
         setTimeout(() => {
@@ -104,33 +111,43 @@ options.forEach(option => {
     });
 });
 
-// デバッグ用のログ追加
+// 結果を表示する関数
 function showResult() {
+    // 全ての質問に回答したか確認
+    if (userAnswers.length < questions.length) {
+        alert('すべての質問に回答してください。');
+        currentQuestion = 0;
+        showQuestion();
+        return;
+    }
+    
     quizContainer.style.display = 'none';
     resultContainer.style.display = 'block';
     
     console.log("User answers:", userAnswers);
     
     // 最も近いキャラクターを計算
-    const characterScores = characters.map((character, index) => {
+    let minScore = Infinity;
+    let closestCharacterIndex = 0;
+    
+    for (let i = 0; i < characters.length; i++) {
         let score = 0;
-        for (let i = 0; i < 10; i++) {
+        for (let j = 0; j < 10; j++) {
             // 各質問の回答とキャラクターの特性の差の二乗を計算
-            score += Math.pow(userAnswers[i] - character.traits[i], 2);
+            const diff = userAnswers[j] - characters[i].traits[j];
+            score += diff * diff;
         }
-        // ユークリッド距離の平方根を返す（値が小さいほど近い）
+        // ユークリッド距離の平方根
         const distance = Math.sqrt(score);
-        console.log(`Character ${character.name} score: ${distance}`);
-        return distance;
-    });
+        console.log(`Character ${characters[i].name} score: ${distance}`);
+        
+        if (distance < minScore) {
+            minScore = distance;
+            closestCharacterIndex = i;
+        }
+    }
     
-    console.log("Character scores:", characterScores);
-    
-    // 最小スコア（最も近い）のキャラクターを見つける
-    const minScore = Math.min(...characterScores);
-    const closestCharacterIndex = characterScores.indexOf(minScore);
     const closestCharacter = characters[closestCharacterIndex];
-    
     console.log("Closest character:", closestCharacter.name, "with score:", minScore);
     
     // 結果を表示
@@ -155,4 +172,7 @@ restartButton.addEventListener('click', () => {
 });
 
 // 初期表示
-showQuestion();
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("App initialized");
+    showQuestion();
+});
