@@ -66,7 +66,6 @@ const resultContainer = document.getElementById('result-container');
 const characterName = document.getElementById('character-name');
 const characterDescription = document.getElementById('character-description');
 const restartButton = document.getElementById('restart-button');
-const twitterShare = document.getElementById('twitter-share');
 
 // 質問を表示する関数
 function showQuestion() {
@@ -153,13 +152,6 @@ function showResult() {
     // 結果を表示
     characterName.textContent = closestCharacter.name;
     characterDescription.textContent = closestCharacter.description;
-    
-    // Twitterシェアボタンの設定
-    twitterShare.addEventListener('click', () => {
-        const text = `宇宙パトロールルル子キャラクター診断の結果：私は「${closestCharacter.name}」タイプでした！`;
-        const url = window.location.href;
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
-    });
 }
 
 // 再診断ボタンのクリックイベント
