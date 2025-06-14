@@ -104,25 +104,34 @@ options.forEach(option => {
     });
 });
 
-// 結果を表示する関数
+// デバッグ用のログ追加
 function showResult() {
     quizContainer.style.display = 'none';
     resultContainer.style.display = 'block';
     
+    console.log("User answers:", userAnswers);
+    
     // 最も近いキャラクターを計算
-    const characterScores = characters.map(character => {
+    const characterScores = characters.map((character, index) => {
         let score = 0;
         for (let i = 0; i < 10; i++) {
             // 各質問の回答とキャラクターの特性の差の二乗を計算
             score += Math.pow(userAnswers[i] - character.traits[i], 2);
         }
         // ユークリッド距離の平方根を返す（値が小さいほど近い）
-        return Math.sqrt(score);
+        const distance = Math.sqrt(score);
+        console.log(`Character ${character.name} score: ${distance}`);
+        return distance;
     });
     
+    console.log("Character scores:", characterScores);
+    
     // 最小スコア（最も近い）のキャラクターを見つける
-    const closestCharacterIndex = characterScores.indexOf(Math.min(...characterScores));
+    const minScore = Math.min(...characterScores);
+    const closestCharacterIndex = characterScores.indexOf(minScore);
     const closestCharacter = characters[closestCharacterIndex];
+    
+    console.log("Closest character:", closestCharacter.name, "with score:", minScore);
     
     // 結果を表示
     characterName.textContent = closestCharacter.name;
